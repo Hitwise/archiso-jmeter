@@ -1,5 +1,23 @@
-[H[2J
-Arch Linux Live ISO (\l)
+           Z        
+           O        
+        588i        
+     u j@@0M@7      
+     @u@BM  :       
+        @B1Y  PY    
+        2@B@B@8G    
+     :0B  @B@5kjJi  
+  B@ZB8O:k8MMNP@Mq.q
+
+Jmeter Slave Live Distro v2.1 "Flame"
+(based on Arch Linux Live ISO) (\l)
 \s-\r \m.
-Default logins "root" and "arch" have no password.
-To begin installation, login as root.
+
+Default logins "root" and "arch" have no password, but you cannot ssh in.
+
+Non-privledged user "liveuser" with password "password" can ssh in.
+
+Jmeter will be running within tmux, as liveuser use "tmux attach" to connect.
+
+You should be able to browse for this machine using Avahi for _ssh._tcp and _jmeter._tcp
+
+Happy performance testing!

@@ -14,3 +14,4 @@
 * please consult http://wiki.archlinux.org.                  *
 *                                                            *
 **************************************************************
+Once logged in as root you can passwd liveuser or su liveuser.
