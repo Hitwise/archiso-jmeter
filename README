@@ -1,0 +1,36 @@
+Flame! 
+======
+
+A JMeter Engine Distribution.
+
+What is it
+----------
+
+Flame boots up from a CD or USB key and requests a IP via DHCP.
+After that, it sets its hostname from the ip address, and runs
+a JMeter server instance in a tmux window.
+
+JMeter is exposed as a Avahi service, and should be
+discoverable by machines on the same subnet.
+
+SSH is enabled, and the username is liveuser, password is password. You can change the password by modifying:
+	
+	config/releng/root-image/etc/rc.local
+
+Building
+--------
+
+We use ArchISO to build our image. To install (as root):
+
+	# make -C archiso install
+
+You then need to copy this checkout to a temporary folder,
+chown it to root, and run:
+
+	# cd configs/releng 
+	# ./build.sh build single netinstall
+
+Contact
+-------
+
+Chris Speck <cgspeck@gmail.com>
