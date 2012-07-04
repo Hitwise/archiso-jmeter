@@ -1,0 +1,44 @@
+#create a user
+useradd -m -g users -G audio,lp,optical,storage,video,wheel,games,power,scanner -s /bin/bash liveuser
+#set their password
+echo liveuser:password | chpasswd
+# Create the user directory for live session
+if [ ! -d /home/liveuser ]; then
+    mkdir /home/liveuser && chown liveuser /home/liveuser
+fi
+
+# Copy files over to home
+su -c "cp -r /etc/skel/.[a-zA-Z0-9]* /home/liveuser/" liveuser
+
+#get ip address
+ipaddr=`ifconfig eth0 | grep "inet\ " | sed 's/^ *//g' | cut -d' ' -f2`
+
+#now create a dynamic hostname
+ipname=`echo ${ipaddr} | tr '.' '-'`
+tmp_host="jmeter-${ipname}"
+
+echo "setting hostname to ${tmp_host}"
+hostname ${tmp_host}
+
+echo "Changing hosts file"
+echo "127.0.0.1	${tmp_host}	${tmp_host}.localdomain	localhost.localdomain	localhost" > /etc/hosts
+
+echo "Restarting Avahi daemon"
+rc.d stop avahi-daemon
+rc.d start avahi-daemon
+
+echo "Calculating memory"
+reserved_mem=65535
+total_mem=$( grep 'MemTotal' /proc/meminfo | awk '{ print $2 }' )
+jmeter_mem=$(( ($total_mem - $reserved_mem) / 1024 ))
+echo "Total: $total_mem Reserved: $reserved_mem Jmeter Max: $jmeter_mem"
+
+echo "Patching jmeter startup script"
+sed -i -e "s:-Xmx512mb:-Xmx${jmeter_mem}mb:" /usr/bin/jmeter
+
+echo "Starting jmeter within tmux detached as liveuser"
+jmeter_log="/var/log/jmeter.log"
+touch $jmeter_log
+chown liveuser $jmemter_log
+
+sudo -u liveuser tmux new -d -s jmetersession -n jmeterwindow "/usr/bin/jmeter -Dserver_port=1099 -s -j /tmp/jmeter.log -Djava.rmi.server.hostname=${ipaddr}"
