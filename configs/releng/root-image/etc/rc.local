@@ -34,7 +34,7 @@ jmeter_mem=$(( ($total_mem - $reserved_mem) / 1024 ))
 echo "Total: $total_mem Reserved: $reserved_mem Jmeter Max: $jmeter_mem"
 
 echo "Patching jmeter startup script"
-sed -i -e "s:-Xmx512mb:-Xmx${jmeter_mem}mb:" /usr/bin/jmeter
+sed -i -e "s:-Xmx512m:-Xmx${jmeter_mem}m:" /usr/bin/jmeter
 
 echo "Starting jmeter within tmux detached as liveuser"
 jmeter_log="/var/log/jmeter.log"
