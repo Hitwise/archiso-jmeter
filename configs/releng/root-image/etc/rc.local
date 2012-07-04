@@ -39,6 +39,6 @@ sed -i -e "s:-Xmx512m:-Xmx${jmeter_mem}m:" /usr/bin/jmeter
 echo "Starting jmeter within tmux detached as liveuser"
 jmeter_log="/var/log/jmeter.log"
 touch $jmeter_log
-chown liveuser $jmemter_log
+chown liveuser $jmeter_log
 
-sudo -u liveuser tmux new -d -s jmetersession -n jmeterwindow "/usr/bin/jmeter -Dserver_port=1099 -s -j /tmp/jmeter.log -Djava.rmi.server.hostname=${ipaddr}"
+sudo -u liveuser tmux new -d -s jmetersession -n jmeterwindow "/usr/bin/jmeter -Dserver_port=1099 -s -j ${jmeter_log} -Djava.rmi.server.hostname=${ipaddr}"
