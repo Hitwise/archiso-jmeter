@@ -24,8 +24,11 @@ We use ArchISO to build our image. To install (as root):
 
 	# make -C archiso install
 
-You then need to copy this checkout to a temporary folder,
-chown it to root, and run:
+You can then run the build script as root, passing it the location of a folder with at least 1700M of free space:
+
+	# ./build.sh ~/scratch
+
+Or you can manually copy this checkout to a temporary folder, chown it to root and:
 
 	# cd configs/releng 
 	# ./build.sh build single netinstall
