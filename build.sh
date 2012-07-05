@@ -24,7 +24,7 @@ fi
 
 
 #check free space
-min_space_required=2000 #in units of 1024 mb
+min_space_required=1700 #in units of 1024 mb
 space_avaliable=`df -BM -P ${work_directory} | sed -e 1d | awk '{print $4}' | sed -e 's:M::'`
 echo -e "${space_avaliable}M avaliable in work directory"
 
