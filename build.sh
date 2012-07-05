@@ -25,7 +25,7 @@ fi
 
 #check free space
 min_space_required=2000 #in units of 1024 mb
-space_avaliable=`df -BM -P ${work_directory} | sed -e 1d | awk '{print $3}' | sed -e 's:M::'`
+space_avaliable=`df -BM -P ${work_directory} | sed -e 1d | awk '{print $4}' | sed -e 's:M::'`
 echo -e "${space_avaliable}M avaliable in work directory"
 
 if [ $space_avaliable -lt $min_space_required ]; then
@@ -56,12 +56,7 @@ cp -R ${source_dir}/* ${temp_directory}
 
 echo -e "Calling Archiso build command"
 cd ${temp_directory}
-#${temp_directory}/build.sh single netinstall
-
-if [ $? -ne 0 ]; then
-    echo -e "It appears the Archiso build process failed. We have left the files intact in ${temp_directory} for you to inspect. You will need to su root / sudo bash or chown them to yourself to take a look. Once done, remove with:\n    sudo rm -rf ${temp_directory}\n\n Please report any bugs you may find in this archiso-jmeter script."
-    exit 6
-fi
+${temp_directory}/build.sh build single netinstall
 
 #move iso file from ${temp_directory}/out to $script_dir out and change group permissions
 
