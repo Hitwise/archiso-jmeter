@@ -1,0 +1,107 @@
+#! /bin/bash -e
+#
+#
+#
+function display_help() {
+cat <<EOF
+Discover Jmeter engines using Avahi/Zeroconf. By default it will print
+a comma seperated list of IPv4 addresses, appropriate for providing direct
+to Jmeter, e.g.:
+
+jmeter -n -t mytest.jmx -R \`detect_jmeter_clients\` -ljmeter-non-interactive.jtl 
+
+Optionally, it can modify an existing jmeter.properties by running it like this:
+detect_jmeter_clients --modify /path/to/jmeter.properties
+
+Then you can start Jmeter in GUI mode and the discovered engines will be avaliable under the Remote Start menu.
+EOF
+	}
+	
+function detect_engines() {
+	#returns CSV list of jmeter engines
+	avahi_output=`avahi-browse _jmeter._tcp -rtpk | grep = | cut -f8 -d';' | tr '\n' ',' | sed '$s/,$//'`
+	if [ "${#avahi_output}" -lt 3 ]; then
+		echo "NO_ENGINES_FOUND"
+	else 
+		echo ${avahi_output} 
+	fi	
+}
+	
+function output_console() {
+	# $1 is the message
+	echo "${@:1}"
+}
+
+function modify_properties() {
+	# $1 is the csv list of hosts
+	# $2 is the file to modify with sed
+	
+	remote_hosts_lines=`grep -e "^remote_hosts=" "$2"  | wc -l`
+	if [ $remote_hosts_lines -eq 1 ]; then
+		#editing an already inplace remote_hosts= line
+		echo -e "Editing existing remote_hosts to read remote_hosts=$1"
+		sed -i "s/^remote_hosts=.*$/remote_hosts=$1/g" "$2"
+		return
+	else
+		if [ $remote_hosts_lines -gt 1 ]; then
+			echo "FATAL: Not sure which existing remote_hosts line you want to modify"
+			exit 4 			
+		fi
+		remote_hosts_lines=`grep -e "^#remote_hosts=" "$2"  | wc -l`
+
+		if [ $remote_hosts_lines -eq 0 ]; then
+			#add a remote_hosts line
+			echo -e "Adding the line remote_hosts=$1 to $2"
+			echo -e "\nremote_hosts=$1" >> "$2"			
+			return
+		fi
+
+		if [ $remote_hosts_lines -eq 1 ]; then
+			#editing an already inplace #remote_hosts= line
+			echo -e "Uncommenting and editing existing remote_hosts to read remote_hosts=$1"
+			sed -i "s/^#remote_hosts=.*$/remote_hosts=$1/g" "$2"
+			return
+		fi		
+		echo "FATAL: Not sure which existing #remote_hosts line you want to modify"
+		exit 3 
+	fi
+	
+}
+
+function containsElement () {
+  local e
+  for e in "${@:2}"; do [[ "$e" = "$1" ]] && return 0; done
+  return 1
+}
+
+if containsElement "--help" $@ ; then
+	display_help
+	exit 0
+fi
+
+Jmeter_engines="$(detect_engines)"
+
+if [[ $Jmeter_engines == "NO_ENGINES_FOUND" ]]; then
+	echo -e "FATAL: Unable to detect any Jmeter engines"
+	exit 2
+fi
+
+
+if [ $# -eq 0 ]; then
+	output_console "${Jmeter_engines}"
+	exit 0
+fi
+
+if [ $# -eq 1 ]; then
+	PROPFILE=${@:1}
+	if [ -w "${PROPFILE}" ]; then
+		modify_properties "${Jmeter_engines}" "${PROPFILE}"
+		exit 0
+	else
+		echo "${PROPFILE} does not exist or is not writable"
+		exit 1
+	fi
+fi
+
+echo "Unrecognised command line option, try running with --help"
+exit 1 
