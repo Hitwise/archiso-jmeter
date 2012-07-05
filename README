@@ -22,11 +22,11 @@ Building
 
 We use ArchISO to build our image. To install (as root):
 
-	# make -C archiso install
+	$ sudo make -C archiso install
 
 You can then run the build script as root, passing it the location of a folder with at least 1700M of free space:
 
-	# ./build.sh ~/scratch
+	$ sudo ./build.sh ~/scratch
 
 Or you can manually copy this checkout to a temporary folder, chown it to root and:
 
