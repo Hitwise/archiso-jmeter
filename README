@@ -1,12 +1,12 @@
-Flame! 
-======
+Archiso-Jmeter! 
+===============
 
-A JMeter Engine Distribution.
+A JMeter Engine Live Distribution.
 
 What is it
 ----------
 
-Flame boots up from a CD or USB key and requests a IP via DHCP.
+This boots up from a CD or USB key and requests a IP via DHCP.
 After that, it sets its hostname from the ip address, and runs
 a JMeter server instance in a tmux window.
 
