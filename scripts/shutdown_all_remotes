@@ -1,0 +1,36 @@
+#!/bin/bash
+
+#figure out where this script is
+SOURCE="${BASH_SOURCE[0]}"
+script_dir="$( dirname "$SOURCE" )"
+while [ -h "$SOURCE" ]
+do 
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
+  script_dir="$( cd -P "$( dirname "$SOURCE"  )" && pwd )"
+done
+script_dir="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+
+#call detection script...
+jmeter_clients=`${script_dir}/detect_jmeter_clients`
+
+#check return code
+rc=$?
+if [ $rc -ne 0 ]; then
+    echo -e "Unable to detect Jmeter clients!\n${jmeter_clients}"
+    exit 1
+fi
+
+old_IFS=${IFS}
+IFS=","
+
+#iterate through the jmeter clients
+for host in $jmeter_clients; do
+    echo -n "Sending shutdown command to ${host}"
+    captured_output=`${script_dir}/shutdown_remote liveuser password ${host}`
+    rc=$?
+    [ $rc -eq 0 ] && echo -e "...\e[00;32mSuccess\e[00m"
+    [ $rc -ne 0 ] && echo -e "...\e[00;31mFailure!!!\e[00m\n ${captured_output}\n************"
+done
+
+IFS=${old_IFS}
