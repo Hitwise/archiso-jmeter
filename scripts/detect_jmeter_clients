@@ -11,7 +11,7 @@ to Jmeter, e.g.:
 jmeter -n -t mytest.jmx -R \`detect_jmeter_clients\` -ljmeter-non-interactive.jtl 
 
 Optionally, it can modify an existing jmeter.properties by running it like this:
-detect_jmeter_clients --modify /path/to/jmeter.properties
+detect_jmeter_clients /path/to/jmeter.properties
 
 Then you can start Jmeter in GUI mode and the discovered engines will be avaliable under the Remote Start menu.
 EOF
