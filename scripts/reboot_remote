@@ -1,0 +1,41 @@
+#!/usr/bin/expect -f 
+ 
+# procedure to attempt connecting; result 0 if OK, 1 otherwise
+proc connect {user passw host} {
+  expect {
+    "*$user@$host's password:" {
+      send "$passw\r"
+        expect {
+          "*\]" {
+            return 0
+          }
+        }
+    }
+  }
+  # timed out
+  return 1
+}
+ 
+#read the input parameters
+set user [lindex $argv 0]
+set passw [lindex $argv 1]
+set host [lindex $argv 2]
+ 
+#check if all were provided
+if { $user == "" || $passw == "" || $host == "" }  {
+  puts "Usage: <user> <passw> <host> \n"
+  exit 1
+}
+ 
+spawn ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no $user@$host
+ 
+set rc [connect $user $passw $host]
+
+if { $rc == 0 } {
+  send "sudo reboot\r"
+  set timeout -1
+  expect eof
+  exit 0
+}
+puts "\nError connecting to server: $host, user: $user and password: $passw!\n"
+exit 1
